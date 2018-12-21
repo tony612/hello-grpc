@@ -11,6 +11,9 @@ steps:
   environment:
     MIX_ENV: prod
   commands:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get
   - mix release
 
 - name: upload to Github
