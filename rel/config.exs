@@ -47,9 +47,8 @@ end
 # will be used by default
 
 release :helloworld do
-  set version: current_version(:helloworld)
+  set version: "current"
   set applications: [
     :runtime_tools
   ]
 end
-

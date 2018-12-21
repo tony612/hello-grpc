@@ -1,0 +1,23 @@
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: build
+  image: elixir:1.7
+  environment:
+    MIX_ENV: prod
+  commands:
+  - mix release
+
+- name: upload to Github
+  image: plugins/github-release
+  settings:
+    checksum:
+      - md5
+    api_key:
+      from_secret: github_token
+    files: _build/prod/rel/helloworld/releases/current/helloworld.tar.gz
