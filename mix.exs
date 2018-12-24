@@ -17,7 +17,7 @@ defmodule Helloworld.Mixfile do
 
   defp deps do
     [
-      {:grpc, github: "tony612/grpc-elixir"},
+      {:grpc, "~> 0.3"},
       {:distillery, "~> 2.0"},
       {:dialyxir, "~> 0.5", only: [:dev, :test], runtime: false},
     ]
