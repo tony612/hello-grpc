@@ -1,12 +1,8 @@
 name: Elixir pre release
 
 on:
-  # Test
-  pull_request:
-    branches: '*'
   push:
     tags: '*'
-  
 
 jobs:
   build:
@@ -23,18 +19,26 @@ jobs:
     - name: Install dependencies
       run:
         mix deps.get
+    - name: Get version for PR
+      if: not contains(github.ref, "tags")
+      run: echo ::set-output name=VERSION::sha-${echo $GITHUB_SHA | cut -c 1-6}
+    - name: Get the version
+      if: contains(github.ref, "tags")
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
     - name: mix release
-      run: mix release
+      run: mix release --version=${{VERSION}}
       env:
         MIX_ENV: prod
+    - name: Get the file name
+      run: echo ::set-output name=RELEASE_FILE::hello-${VERSION}.tar.gz
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ VERSION }}
+        release_name: Release ${{ VERSION }}
         draft: false
         prerelease: true
     - name: Upload Release Asset
@@ -44,4 +48,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./_build/prod/*.tar.gz
+        asset_path: ./_build/prod/${{RELEASE_FILE}}
+        asset_name: ${{RELEASE_FILE}}
