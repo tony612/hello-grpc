@@ -23,7 +23,8 @@ defmodule Helloworld.Mixfile do
         applications: [
           runtime_tools: :permanent,
           helloworld: :permanent
-        ]
+        ],
+        steps: [:assemble, :tar]
       ]
     ]
   end
