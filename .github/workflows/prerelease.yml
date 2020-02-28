@@ -27,11 +27,9 @@ jobs:
       run: mix release
       env:
         MIX_ENV: prod
-    - uses: release-drafter/release-drafter@v5
+    - name: Create release
       id: create_release
-      #with:
-        # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
-        # config-name: my-config.yml
+      uses: release-drafter/release-drafter@v5
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Upload Release Asset
