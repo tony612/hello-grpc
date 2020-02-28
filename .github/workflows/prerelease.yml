@@ -29,7 +29,7 @@ jobs:
       if: contains(github.ref, "tags")
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
     - name: mix release
-      run: mix release --version=${{VERSION}}
+      run: mix release --version=${{env.VERSION}}
       env:
         MIX_ENV: prod
     - name: Get the file name
@@ -40,8 +40,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ VERSION }}
-        release_name: Release ${{ VERSION }}
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
         draft: false
         prerelease: true
     - name: Upload Release Asset
@@ -51,5 +51,5 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./_build/prod/${{RELEASE_FILE}}
-        asset_name: ${{RELEASE_FILE}}
+        asset_path: ./_build/prod/${{env.RELEASE_FILE}}
+        asset_name: ${{env.RELEASE_FILE}}
