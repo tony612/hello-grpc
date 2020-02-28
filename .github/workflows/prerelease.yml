@@ -33,7 +33,7 @@ jobs:
       env:
         MIX_ENV: prod
     - name: Get the file name
-      run: echo ::set-output name=RELEASE_FILE::hello-${VERSION}.tar.gz
+      run: echo ::set-env name=RELEASE_FILE::hello-${VERSION}.tar.gz
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -53,3 +53,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ./_build/prod/${{env.RELEASE_FILE}}
         asset_name: ${{env.RELEASE_FILE}}
+        asset_content_type: application/gzip
