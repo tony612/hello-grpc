@@ -1,6 +1,9 @@
 name: Elixir pre release
 
 on:
+  # Test
+  pull_request:
+    branches: '*'
   push:
     tags: '*'
 
