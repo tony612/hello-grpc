@@ -4,8 +4,9 @@ on:
   # Test
   pull_request:
     branches: '*'
-  release:
-    types: [prereleased]
+  push:
+    tags: '*'
+  
 
 jobs:
   build:
@@ -24,3 +25,20 @@ jobs:
         mix deps.get
     - name: mix release
       run: mix release
+      env:
+        MIX_ENV: prod
+    - uses: release-drafter/release-drafter@v5
+      id: create_release
+      #with:
+        # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
+        # config-name: my-config.yml
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./_build/prod/*.tar.gz
