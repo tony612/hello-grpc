@@ -24,7 +24,7 @@ jobs:
         mix deps.get
     - name: Get version for PR
       if:  ${{ !contains(github.ref, 'tags') }}
-      run: echo "::set-env name=VERSION::sha-${echo $GITHUB_SHA | cut -c 1-6}"
+      run: echo ::set-env name=VERSION::${echo "sha-$GITHUB_SHA" | cut -c 1-10}
     - name: Get the version
       if: contains(github.ref, 'tags')
       run: echo ::set-env name=VERSION::${GITHUB_REF/refs\/tags\//}
