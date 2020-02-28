@@ -23,7 +23,7 @@ jobs:
       run:
         mix deps.get
     - name: Get version for PR
-      if: not contains(github.ref, "tags")
+      if: ${{ !contains(github.ref, "tags") }}
       run: echo ::set-output name=VERSION::sha-${echo $GITHUB_SHA | cut -c 1-6}
     - name: Get the version
       if: contains(github.ref, "tags")
