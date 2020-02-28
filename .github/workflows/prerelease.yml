@@ -23,7 +23,7 @@ jobs:
       run:
         mix deps.get
     - name: Set release name
-      run: echo ::set-env name=RLS_NAME::helloword
+      run: echo ::set-env name=RLS_NAME::helloworld
     - name: Get version for PR
       if:  ${{ !contains(github.ref, 'tags') }}
       run: echo ::set-env name=VERSION::sha-$(echo $GITHUB_SHA | cut -c 1-6)
