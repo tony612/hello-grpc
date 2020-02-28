@@ -22,6 +22,8 @@ jobs:
     - name: Install dependencies
       run:
         mix deps.get
+    - name: Set release name
+      run: echo ::set-env name=RLS_NAME::helloword
     - name: Get version for PR
       if:  ${{ !contains(github.ref, 'tags') }}
       run: echo ::set-env name=VERSION::sha-$(echo $GITHUB_SHA | cut -c 1-6)
@@ -33,7 +35,7 @@ jobs:
       env:
         MIX_ENV: prod
     - name: Get the file name
-      run: echo ::set-env name=RELEASE_FILE::hello-${VERSION}.tar.gz
+      run: echo ::set-env name=RELEASE_FILE::${RLS_NAME}-${VERSION}.tar.gz
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
