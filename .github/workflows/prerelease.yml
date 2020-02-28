@@ -1,0 +1,58 @@
+name: Elixir pre release
+
+on:
+  # Test
+  pull_request:
+    branches: '*'
+  push:
+    tags: '*'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: 1.9 # Define the elixir version [required]
+        otp-version: 22.2 # Define the OTP version [required]
+    - name: Install dependencies
+      run:
+        mix deps.get
+    - name: Set release name
+      run: echo ::set-env name=RLS_NAME::helloworld
+    - name: Get version for PR
+      if:  ${{ !contains(github.ref, 'tags') }}
+      run: echo ::set-env name=VERSION::sha-$(echo $GITHUB_SHA | cut -c 1-6)
+    - name: Get the version
+      if: contains(github.ref, 'tags')
+      run: echo ::set-env name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: mix release
+      run: mix release --version=${{env.VERSION}}
+      env:
+        MIX_ENV: prod
+    - name: Get the file name
+      run: echo ::set-env name=RELEASE_FILE::${RLS_NAME}-${VERSION}.tar.gz
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
+        draft: false
+        prerelease: true
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./_build/prod/${{env.RELEASE_FILE}}
+        asset_name: ${{env.RELEASE_FILE}}
+        asset_content_type: application/gzip
